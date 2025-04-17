@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRCTC Ticket Booking Simulation - SimuLearn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Netflix-inspired styles */
+        :root {
+            --primary-color: #e50914;
+            --primary-hover: #f40612;
+            --secondary-color: #141414;
+            --text-color: #ffffff;
+            --text-secondary: #a3a3a3;
+            --bg-dark: #141414;
+            --bg-darker: #0b0b0b;
+            --bg-card: #181818;
+            --border-radius: 4px;
+            --transition: all 0.3s ease;
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-dark);
+        }
+        
+        h1, h2, h3 {
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 4%;
+        }
+        
+        /* Navigation bar styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4%;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+        
+        header.scrolled {
+            background-color: var(--bg-darker);
+        }
+        
+        .logo h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo h1 a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 5px 2px;
+            transition: var(--transition);
+        }
+        
+        nav ul li a:hover {
+            color: var(--text-secondary);
+        }
+        
+        nav ul li a.active {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        /* Simulation Container */
+        .simulation-container {
+            padding-top: 100px;
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        
+        .simulation-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .simulation-header h1 {
+            font-size: 2.5rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        
+        .simulation-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+        
+        .simulation-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* Progress Tracker */
+        .simulation-controls {
+            background-color: var(--bg-darker);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .progress-tracker {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background-color: #333;
+            z-index: 1;
+        }
+        
+        .progress-step.active .step-number {
+            background-color: var(--primary-color);
+        }
+        
+        .progress-step.completed .step-number {
+            background-color: var(--primary-color);
+        }
+        
+        .progress-step.completed:not(:last-child)::after {
+            background-color: var(--primary-color);
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            z-index: 2;
+            margin-bottom: 10px;
+        }
+        
+        .step-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .progress-step.active .step-text,
+        .progress-step.completed .step-text {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .simulation-instructions {
+            background-color: rgba(20, 20, 20, 0.5);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .simulation-instructions h3 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .simulation-instructions p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        
+        /* IRCTC Specific Styles */
+        .irctc-screen {
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .irctc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #111;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .irctc-logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .irctc-logo i {
+            margin-right: 10px;
+        }
+        
+        .irctc-user {
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+        }
+        
+        .irctc-user i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        
+        .irctc-content {
+            padding: 25px;
+        }
+        
+        .irctc-content h2 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        /* Form Styles */
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            grid-column: span 3;
+        }
+        
+        .form-group:nth-child(1) {
+            grid-column: 1;
+        }
+        
+        .form-group:nth-child(3) {
+            grid-column: 3;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            background-color: #222;
+            overflow: hidden;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .input-with-icon input, 
+        .input-with-icon select {
+            width: 100%;
+            padding: 12px 12px 12px 35px;
+            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        
+        .input-with-icon input:focus,
+        .input-with-icon select:focus {
+            outline: none;
+        }
+        
+        select option {
+            background-color: #222;
+            color: var(--text-color);
+        }
+        
+        .stations-swap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            grid-column: 2;
+            align-self: end;
+            margin-bottom: 20px;
+        }
+        
+        #swap-stations {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #222;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+        
+        #swap-stations:hover {
+            background-color: #333;
+        }
+        
+        .quota-group {
+            margin-top: 15px;
+        }
+        
+        .quota-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quota-option {
+            flex: 1;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: #222;
+            color: var(--text-secondary);
+        }
+        
+        .quota-option.active {
+            background-color: rgba(229, 9, 20, 0.1);
+            border-color: var(--primary-color);
+            color: var(--text-color);
+        }
+        
+        .quota-option input {
+            margin-right: 8px;
+        }
+
+        .error-message {
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .irctc-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+        }
+        
+        .irctc-button:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .irctc-button i {
+            margin-right: 10px;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 991px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group:nth-child(1),
+            .form-group:nth-child(3) {
+                grid-column: span 1;
+            }
+            
+            .stations-swap {
+                margin: 10px 0;
+                grid-column: span 1;
+                justify-content: flex-start;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .simulation-container {
+                padding-top: 80px;
+            }
+            
+            .simulation-header h1 {
+                font-size: 2rem;
+            }
+            
+            .progress-tracker {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .progress-step {
+                flex-basis: 30%;
+            }
+            
+            .progress-step:not(:last-child)::after {
+                display: none;
+            }
+        }
+        
+        /* Hide other steps initially */
+        .irctc-content:not(#step-1) {
+            display: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Show step when it's active */
+        .irctc-content {
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        /* Add these styles for other steps as needed */
+        /* You can expand this when we need to style other steps */
+        
+        /* Train List Styles */
+        .train-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .train-card {
+            background-color: #222;
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            transition: var(--transition);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .train-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .train-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            grid-column: span 2;
+        }
+        
+        .train-number {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .train-name {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+        
+        .train-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .train-timing {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .departure, .arrival {
+            text-align: center;
+        }
+        
+        .time {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+        
+        .station {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .journey-duration {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin: 0 15px;
+        }
+        
+        .duration {
+            font-size: 0.85rem;
+            background-color: #333;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .journey-line {
+            width: 100%;
+            position: relative;
+            height: 20px;
+        }
+        
+        .line {
+            height: 2px;
+            background-color: #444;
+            width: 100%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .line::before, .line::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .line::before {
+            left: 0;
+        }
+        
+        .line::after {
+            right: 0;
+        }
+        
+        .train-class {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+        }
+        
+        .class-name {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .availability {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+        }
+        
+        .availability.available {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .availability.limited {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .availability.waitlist {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        .availability.not-available {
+            background-color: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+        
+        .fare {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-left: 10px;
+        }
+        
+        .select-train-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            align-self: center;
+        }
+        
+        .select-train-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .select-train-btn.disabled {
+            background-color: #444;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        /* Step Header Styles */
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .journey-summary {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .small-button {
+            padding: 5px 10px;
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: var(--transition);
+        }
+        
+        .small-button:hover {
+            background-color: rgba(229, 9, 20, 0.1);
+        }
+        
+        /* Fare Summary Styles */
+        .fare-summary {
+            background-color: #222;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .fare-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            color: var(--text-secondary);
+        }
+        
+        .fare-item.total {
+            color: var(--text-color);
+            font-weight: 600;
+            border-top: 2px solid #333;
+            margin-top: 5px;
+            padding-top: 10px;
+        }
+
+        /* Error states for train list */
+        .no-trains {
+            padding: 30px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
+            font-style: italic;
+            margin: 20px 0;
+        }
+        
+        .error-card {
+            background-color: #fff3f3 !important;
+            border-color: #f44336 !important;
+            padding: 20px;
+            text-align: center;
+            color: #d32f2f;
+        }
+        
+        .error-card p:first-child {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .error-card p:last-child {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .no-classes-message {
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="logo">
+            <h1><a href="../index.html">SimuLearn</a></h1>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#simulations" class="active">Simulations</a></li>
+                <li><a href="../index.html#faq">FAQ</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="simulation-container">
+        <div class="simulation-header">
+            <h1>IRCTC Ticket Booking Simulation</h1>
+            <p>Practice booking train tickets without actual transaction</p>
+        </div>
+
+        <div class="simulation-content">
+            <div class="simulation-controls">
+                <div class="progress-tracker">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Search Trains</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Select Train</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Passenger Details</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Payment</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Confirmation</div>
+                    </div>
+                </div>
+                <div class="simulation-instructions">
+                    <h3>Instructions:</h3>
+                    <div id="instruction-content">
+                        <p>Enter your journey details to search for available trains. Select from, to, and date of journey.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-screen irctc-screen">
+                <div class="irctc-header">
+                    <div class="irctc-logo">
+                        <i class="fas fa-train"></i>
+                        <span>SimuIRCTC</span>
+                    </div>
+                    <div class="irctc-user">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Guest User</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Search Trains -->
+                <div class="irctc-content" id="step-1">
+                    <h2>Search Trains</h2>
+                    
+                    <div class="search-form" id="search-form">
+                        <div class="form-group">
+                            <label for="from-station">From Station</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="from-station" list="stations" placeholder="Enter source station" autocomplete="off">
+                            </div>
+                            <small class="error-message"></small>
+                        </div>
+                        
+                        <div class="stations-swap">
+                            <button type="button" id="swap-stations"><i class="fas fa-exchange-alt"></i></button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="to-station">To Station</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="to-station" list="stations" placeholder="Enter destination station" autocomplete="off">
+                            </div>
+                            <small class="error-message"></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="journey-date">Journey Date</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                                <input type="date" id="journey-date">
+                            </div>
+                            <small class="error-message"></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="journey-class">Travel Class</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-couch"></i>
+                                <select id="journey-class">
+                                    <option value="SL">Sleeper Class (SL)</option>
+                                    <option value="3A">AC 3 Tier (3A)</option>
+                                    <option value="2A">AC 2 Tier (2A)</option>
+                                    <option value="1A">AC First Class (1A)</option>
+                                    <option value="CC">AC Chair Car (CC)</option>
+                                    <option value="EC">Executive Class (EC)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group quota-group">
+                            <label>Quota</label>
+                            <div class="quota-options">
+                                <label class="quota-option active">
+                                    <input type="radio" name="quota" value="GN" checked>
+                                    <span>General</span>
+                                </label>
+                                <label class="quota-option">
+                                    <input type="radio" name="quota" value="LD">
+                                    <span>Ladies</span>
+                                </label>
+                                <label class="quota-option">
+                                    <input type="radio" name="quota" value="TQ">
+                                    <span>Tatkal</span>
+                                </label>
+                                <label class="quota-option">
+                                    <input type="radio" name="quota" value="PT">
+                                    <span>Premium Tatkal</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="irctc-button" id="search-trains">
+                            <i class="fas fa-search"></i>
+                            Search Trains
+                        </button>
+                    </div>
+                    
+                    <datalist id="stations">
+                        <option value="NDLS - New Delhi">
+                        <option value="MAS - Chennai Central">
+                        <option value="CSTM - Mumbai CST">
+                        <option value="HWH - Howrah Junction">
+                        <option value="SBC - Bengaluru City Junction">
+                        <option value="SC - Secunderabad Junction">
+                        <option value="JP - Jaipur Junction">
+                        <option value="PUNE - Pune Junction">
+                        <option value="LKO - Lucknow">
+                        <option value="ADI - Ahmedabad Junction">
+                    </datalist>
+                </div>
+                
+                <!-- Step 2: Select Train -->
+                <div class="irctc-content hidden" id="step-2">
+                    <div class="step-header">
+                        <h2>Select Train</h2>
+                        <div class="journey-summary">
+                            <span id="journey-summary"></span>
+                            <button id="modify-search" class="small-button">Modify</button>
+                        </div>
+                    </div>
+                    
+                    <div class="train-list" id="train-list">
+                        <!-- Train cards will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Step 3: Passenger Details -->
+                <div class="irctc-content hidden" id="step-3">
+                    <div class="step-header">
+                        <h2>Passenger Details</h2>
+                        <div class="journey-summary">
+                            <span id="train-summary"></span>
+                            <button id="change-train" class="small-button">Change</button>
+                        </div>
+                    </div>
+                    
+                    <div class="passenger-form">
+                        <h3>Enter Passenger Details</h3>
+                        
+                        <div id="passengers-container">
+                            <div class="passenger-card" data-passenger="1">
+                                <div class="passenger-header">
+                                    <h4>Passenger 1</h4>
+                                </div>
+                                
+                                <div class="passenger-details">
+                                    <div class="form-group">
+                                        <label for="name-1">Name</label>
+                                        <input type="text" id="name-1" placeholder="Full Name">
+                                        <small class="error-message"></small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="age-1">Age</label>
+                                        <input type="number" id="age-1" min="1" max="120" placeholder="Age">
+                                        <small class="error-message"></small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="gender-1">Gender</label>
+                                        <select id="gender-1">
+                                            <option value="">Select</option>
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                            <option value="O">Other</option>
+                                        </select>
+                                        <small class="error-message"></small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="berth-1">Berth Preference</label>
+                                        <select id="berth-1">
+                                            <option value="NO">No Preference</option>
+                                            <option value="LB">Lower Berth</option>
+                                            <option value="MB">Middle Berth</option>
+                                            <option value="UB">Upper Berth</option>
+                                            <option value="SL">Side Lower</option>
+                                            <option value="SU">Side Upper</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="passenger-actions">
+                            <button id="add-passenger" class="secondary-button">
+                                <i class="fas fa-plus"></i> Add Passenger
+                            </button>
+                            
+                            <div class="form-group contact-details">
+                                <label for="mobile">Mobile Number</label>
+                                <input type="tel" id="mobile" placeholder="10 digit mobile number">
+                                <small class="error-message"></small>
+                            </div>
+                            
+                            <div class="form-group contact-details">
+                                <label for="email">Email ID</label>
+                                <input type="email" id="email" placeholder="For e-ticket">
+                                <small class="error-message"></small>
+                            </div>
+                            
+                            <button id="continue-payment" class="irctc-button">Continue to Payment</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Payment -->
+                <div class="irctc-content hidden" id="step-4">
+                    <div class="step-header">
+                        <h2>Payment</h2>
+                        <div class="journey-summary">
+                            <span id="payment-summary"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-container">
+                        <div class="fare-summary">
+                            <h3>Fare Summary</h3>
+                            <div class="fare-item">
+                                <span>Base Fare</span>
+                                <span id="base-fare">₹0</span>
+                            </div>
+                            <div class="fare-item">
+                                <span>Reservation Charges</span>
+                                <span id="reservation-charges">₹0</span>
+                            </div>
+                            <div class="fare-item">
+                                <span>GST</span>
+                                <span id="gst-charges">₹0</span>
+                            </div>
+                            <div class="fare-item">
+                                <span>Convenience Fee</span>
+                                <span id="convenience-fee">₹0</span>
+                            </div>
+                            <div class="fare-item total">
+                                <span>Total Amount</span>
+                                <span id="total-amount">₹0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-methods">
+                            <h3>Select Payment Method</h3>
+                            
+                            <div class="payment-options">
+                                <label class="payment-option active">
+                                    <input type="radio" name="payment-method" value="upi" checked>
+                                    <div class="payment-option-content">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>UPI Payment</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-option">
+                                    <input type="radio" name="payment-method" value="card">
+                                    <div class="payment-option-content">
+                                        <i class="fas fa-credit-card"></i>
+                                        <span>Credit/Debit Card</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-option">
+                                    <input type="radio" name="payment-method" value="net-banking">
+                                    <div class="payment-option-content">
+                                        <i class="fas fa-university"></i>
+                                        <span>Net Banking</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-option">
+                                    <input type="radio" name="payment-method" value="wallet">
+                                    <div class="payment-option-content">
+                                        <i class="fas fa-wallet"></i>
+                                        <span>Wallet</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="upi-payment-form">
+                                <div class="form-group">
+                                    <label for="upi-id">Enter UPI ID</label>
+                                    <input type="text" id="upi-id" placeholder="example@upi">
+                                    <small class="error-message"></small>
+                                </div>
+                                
+                                <div class="form-group terms">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="terms-checkbox">
+                                        <span>I agree to the terms and conditions</span>
+                                    </label>
+                                    <small class="error-message"></small>
+                                </div>
+                                
+                                <div class="payment-actions">
+                                    <button id="back-to-passengers" class="secondary-button">Back</button>
+                                    <button id="make-payment" class="irctc-button">Make Payment</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Confirmation -->
+                <div class="irctc-content hidden" id="step-5">
+                    <div class="ticket-confirmation">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        
+                        <h2>Booking Successful!</h2>
+                        <p class="booking-message">Your train ticket has been booked successfully.</p>
+                        
+                        <div class="e-ticket">
+                            <div class="ticket-header">
+                                <div class="irctc-logo-small">
+                                    <i class="fas fa-train"></i>
+                                    <span>SimuIRCTC</span>
+                                </div>
+                                <div class="ticket-id">
+                                    <span>PNR: </span>
+                                    <span id="ticket-pnr"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="ticket-journey">
+                                <div class="journey-stations">
+                                    <div class="from-details">
+                                        <div class="station-code" id="ticket-from-code"></div>
+                                        <div class="station-name" id="ticket-from-name"></div>
+                                    </div>
+                                    
+                                    <div class="journey-line">
+                                        <i class="fas fa-circle"></i>
+                                        <div class="line"></div>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    
+                                    <div class="to-details">
+                                        <div class="station-code" id="ticket-to-code"></div>
+                                        <div class="station-name" id="ticket-to-name"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="journey-details">
+                                    <div class="journey-item">
+                                        <span class="item-label">Train:</span>
+                                        <span class="item-value" id="ticket-train-number"></span>
+                                    </div>
+                                    <div class="journey-item">
+                                        <span class="item-label">Train Name:</span>
+                                        <span class="item-value" id="ticket-train-name"></span>
+                                    </div>
+                                    <div class="journey-item">
+                                        <span class="item-label">Class:</span>
+                                        <span class="item-value" id="ticket-class"></span>
+                                    </div>
+                                    <div class="journey-item">
+                                        <span class="item-label">Date:</span>
+                                        <span class="item-value" id="ticket-date"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="ticket-passengers">
+                                <h4>Passenger Details</h4>
+                                <table class="passenger-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Gender</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ticket-passengers">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="ticket-footer">
+                                <div class="fare-details">
+                                    <span>Total Fare:</span>
+                                    <span id="ticket-fare"></span>
+                                </div>
+                                <div class="ticket-message">
+                                    Happy Journey!
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="confirmation-actions">
+                            <button id="download-ticket" class="secondary-button">
+                                <i class="fas fa-download"></i> Download Ticket
+                            </button>
+                            <button id="new-booking" class="irctc-button">New Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SimuLearn</h3>
+                    <p>Learn various digital services through interactive simulations</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#simulations">Simulations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@simullearn.com</p>
+                    <p>Phone: +1 234 567 8900</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 SimuLearn. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Apply header scrolled effect
+        const header = document.getElementById('header');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+        
+        // Keep your existing IRCTC simulation JS functionality
+    </script>
+    
+    <script src="../js/irctc-simulation.js"></script>
+</body>
+</html> 

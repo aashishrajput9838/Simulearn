@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Installation Simulation - SimuLearn</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/simulation.css">
+    <link rel="stylesheet" href="../css/windows.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Netflix-inspired styles */
+        :root {
+            --primary-color: #e50914;
+            --primary-hover: #f40612;
+            --secondary-color: #141414;
+            --text-color: #ffffff;
+            --text-secondary: #a3a3a3;
+            --bg-dark: #141414;
+            --bg-darker: #0b0b0b;
+            --bg-card: #181818;
+            --border-radius: 4px;
+            --transition: all 0.3s ease;
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-dark);
+        }
+        
+        h1, h2, h3 {
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Navigation bar styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4%;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+        
+        header.scrolled {
+            background-color: var(--bg-darker);
+        }
+        
+        .logo h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        .logo h1 a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 5px 2px;
+            transition: var(--transition);
+        }
+        
+        nav ul li a:hover {
+            color: var(--text-secondary);
+        }
+        
+        nav ul li a.active {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        /* Fallback styling for Windows logo */
+        .installation-header img {
+            max-width: 100px;
+            height: auto;
+            display: block;
+            margin-bottom: 15px;
+            background-color: #0078d7;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        /* Hide elements that might be empty and causing issues */
+        img[src=""] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1><a href="../index.html">SimuLearn</a></h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#simulations" class="active">Simulations</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="simulation-container">
+        <div class="simulation-header">
+            <h1>Windows Installation Simulation</h1>
+            <p>Learn how to install Windows without needing a real computer</p>
+        </div>
+
+        <div class="simulation-content">
+            <div class="simulation-controls">
+                <div class="progress-tracker">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Boot Setup</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Installation</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Configuration</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Complete</div>
+                    </div>
+                </div>
+                <div class="simulation-instructions">
+                    <h3>Instructions:</h3>
+                    <div id="instruction-content">
+                        <p>Insert the Windows installation media and boot your computer. Press any key when prompted to boot from the DVD/USB.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-screen windows-screen">
+                <div class="screen-container">
+                    <!-- Step 1: Boot Setup -->
+                    <div class="windows-screen" id="step-1">
+                        <div class="boot-screen">
+                            <div class="boot-message">
+                                <p>Press any key to boot from CD or DVD...</p>
+                            </div>
+                            <button class="any-key-btn">Press any key</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Windows Installation -->
+                    <div class="windows-screen hidden" id="step-2">
+                        <div class="installation-screen">
+                            <div class="installation-header">
+                                <img src="../images/windows-logo.png" alt="Windows Logo" onerror="this.src='../images/windows-logo-placeholder.png'">
+                                <h2>Windows Setup</h2>
+                            </div>
+                            
+                            <div class="installation-step" id="language-step">
+                                <h3>Language, time and currency format, and keyboard</h3>
+                                <div class="form-group">
+                                    <label for="language">Language to install:</label>
+                                    <select id="language">
+                                        <option value="en-us">English (United States)</option>
+                                        <option value="en-gb">English (United Kingdom)</option>
+                                        <option value="fr-fr">French (France)</option>
+                                        <option value="de-de">German (Germany)</option>
+                                        <option value="es-es">Spanish (Spain)</option>
+                                        <option value="zh-cn">Chinese (Simplified, China)</option>
+                                        <option value="ja-jp">Japanese (Japan)</option>
+                                        <option value="ko-kr">Korean (Korea)</option>
+                                        <option value="pt-br">Portuguese (Brazil)</option>
+                                        <option value="ru-ru">Russian (Russia)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="time-format">Time and currency format:</label>
+                                    <select id="time-format">
+                                        <option value="en-us">English (United States)</option>
+                                        <option value="en-gb">English (United Kingdom)</option>
+                                        <option value="fr-fr">French (France)</option>
+                                        <option value="de-de">German (Germany)</option>
+                                        <option value="es-es">Spanish (Spain)</option>
+                                        <option value="zh-cn">Chinese (Simplified, China)</option>
+                                        <option value="ja-jp">Japanese (Japan)</option>
+                                        <option value="ko-kr">Korean (Korea)</option>
+                                        <option value="pt-br">Portuguese (Brazil)</option>
+                                        <option value="ru-ru">Russian (Russia)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="keyboard">Keyboard or input method:</label>
+                                    <select id="keyboard">
+                                        <option value="us">US</option>
+                                        <option value="uk">UK</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="zh">Chinese</option>
+                                        <option value="ja">Japanese</option>
+                                        <option value="ko">Korean</option>
+                                        <option value="pt">Portuguese</option>
+                                        <option value="ru">Russian</option>
+                                    </select>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button" id="next-language">Next</button>
+                                </div>
+                            </div>
+                            
+                            <div class="installation-step hidden" id="license-step">
+                                <h3>Applicable notices and license terms</h3>
+                                <div class="license-text">
+                                    <p>MICROSOFT SOFTWARE LICENSE TERMS</p>
+                                    <p>MICROSOFT WINDOWS OPERATING SYSTEM</p>
+                                    <div class="license-content">
+                                        <p>These license terms are an agreement between you and Microsoft Corporation (or one of its affiliates). They apply to the software named above and any Microsoft services or software updates (except to the extent such services or updates are accompanied by new or additional terms, in which case those different terms apply prospectively and do not alter your or Microsoft's rights relating to pre-updated software or services). IF YOU COMPLY WITH THESE LICENSE TERMS, YOU HAVE THE RIGHTS BELOW. BY USING THE SOFTWARE, YOU ACCEPT THESE TERMS.</p>
+                                        
+                                        <p>1. INSTALLATION AND USE RIGHTS.</p>
+                                        <p>a) License. The software is licensed, not sold. Under this agreement, we grant you the right to install and run one instance of the software on your device (the licensed device), for use by one person at a time, so long as you comply with all the terms of this agreement.</p>
+                                        
+                                        <p>2. PRIVACY; CONSENT TO USE OF DATA.</p>
+                                        <p>Your privacy is important to us. Some of the software features send or receive information when using those features. Many of these features can be switched off in the user interface, or you can choose not to use them. By accepting this agreement and using the software you agree that Microsoft may collect, use, and disclose the information as described in the Microsoft Privacy Statement.</p>
+                                        
+                                        <p>3. TRANSFER.</p>
+                                        <p>The provisions of this section do not apply if you acquired the software in Germany or in any of the countries listed on this site, in which case any transfer of the software to a third party, and the right to use it, must comply with applicable law.</p>
+                                        
+                                        <p>4. EXPORT RESTRICTIONS.</p>
+                                        <p>You must comply with all domestic and international export laws and regulations that apply to the software, which include restrictions on destinations, end users, and end use.</p>
+                                        
+                                        <p>5. SUPPORT SERVICES.</p>
+                                        <p>Microsoft provides support services for the software as described at support.microsoft.com/common/international.aspx.</p>
+                                        
+                                        <p>6. ENTIRE AGREEMENT.</p>
+                                        <p>This agreement, and the terms for supplements, updates, Internet-based services and support services that you use, are the entire agreement for the software and support services.</p>
+                                        
+                                        <p>7. APPLICABLE LAW.</p>
+                                        <p>If you acquired the software in the United States, Washington state law applies to interpretation of and claims for breach of this agreement, and the laws of the state where you live apply to all other claims. If you acquired the software in any other country, its laws apply.</p>
+                                    </div>
+                                </div>
+                                <div class="accept-license">
+                                    <label>
+                                        <input type="checkbox" id="accept-checkbox">
+                                        <span>I accept the license terms</span>
+                                    </label>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-license">Back</button>
+                                    <button class="windows-button" id="next-license" disabled>Next</button>
+                                </div>
+                            </div>
+                            
+                            <div class="installation-step hidden" id="install-type-step">
+                                <h3>Which type of installation do you want?</h3>
+                                <div class="install-options">
+                                    <div class="install-option">
+                                        <input type="radio" id="upgrade" name="install-type" value="upgrade">
+                                        <label for="upgrade">
+                                            <div class="option-title">Upgrade</div>
+                                            <div class="option-description">Keeps your files, apps, and settings.</div>
+                                        </label>
+                                    </div>
+                                    <div class="install-option">
+                                        <input type="radio" id="custom" name="install-type" value="custom" checked>
+                                        <label for="custom">
+                                            <div class="option-title">Custom</div>
+                                            <div class="option-description">Installs a fresh copy of Windows.</div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-install-type">Back</button>
+                                    <button class="windows-button" id="next-install-type">Next</button>
+                                </div>
+                            </div>
+                            
+                            <div class="installation-step hidden" id="disk-step">
+                                <h3>Where do you want to install Windows?</h3>
+                                <div class="disk-options">
+                                    <div class="disk-table-container">
+                                        <table class="disk-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Drive</th>
+                                                    <th>Size</th>
+                                                    <th>Type</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="selectable selected" data-disk="0">
+                                                    <td>Drive 0</td>
+                                                    <td>500 GB</td>
+                                                    <td>Basic</td>
+                                                </tr>
+                                                <tr class="selectable" data-disk="1">
+                                                    <td>Drive 1</td>
+                                                    <td>1 TB</td>
+                                                    <td>Basic</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="disk-actions">
+                                        <button class="disk-action-btn" id="format-btn">Format</button>
+                                        <button class="disk-action-btn" id="new-btn">New</button>
+                                        <button class="disk-action-btn" id="delete-btn">Delete</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-disk">Back</button>
+                                    <button class="windows-button" id="next-disk">Next</button>
+                                </div>
+                            </div>
+                            
+                            <div class="installation-step hidden" id="installing-step">
+                                <h3>Installing Windows...</h3>
+                                <div class="install-progress">
+                                    <div class="progress-text">Copying Windows files...</div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" id="install-progress-bar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="progress-percentage">0%</div>
+                                    <div class="progress-description">This might take a while</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Windows Configuration -->
+                    <div class="windows-screen hidden" id="step-3">
+                        <div class="config-screen">
+                            <div class="config-header">
+                                <h2>Let's set up your account</h2>
+                            </div>
+                            
+                            <div class="config-step" id="region-step">
+                                <h3>Region</h3>
+                                <p>Is this the right country or region?</p>
+                                <div class="form-group">
+                                    <select id="region">
+                                        <option value="us">United States</option>
+                                        <option value="uk">United Kingdom</option>
+                                        <option value="ca">Canada</option>
+                                        <option value="au">Australia</option>
+                                        <option value="in">India</option>
+                                        <option value="de">Germany</option>
+                                        <option value="fr">France</option>
+                                        <option value="jp">Japan</option>
+                                        <option value="br">Brazil</option>
+                                        <option value="mx">Mexico</option>
+                                    </select>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button" id="next-region">Yes</button>
+                                </div>
+                            </div>
+                            
+                            <div class="config-step hidden" id="keyboard-step">
+                                <h3>Keyboard Layout</h3>
+                                <p>Is this the right keyboard layout?</p>
+                                <div class="form-group">
+                                    <select id="keyboard-layout">
+                                        <option value="us">US (QWERTY)</option>
+                                        <option value="uk">UK (QWERTY)</option>
+                                        <option value="dvorak">Dvorak</option>
+                                        <option value="azerty">AZERTY (French)</option>
+                                        <option value="qwertz">QWERTZ (German)</option>
+                                    </select>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-keyboard-layout">Back</button>
+                                    <button class="windows-button" id="next-keyboard-layout">Yes</button>
+                                </div>
+                            </div>
+                            
+                            <div class="config-step hidden" id="network-step">
+                                <h3>Let's connect you to a network</h3>
+                                <div class="network-list">
+                                    <div class="network-item">
+                                        <div class="network-info">
+                                            <div class="network-name">Wi-Fi Network 1</div>
+                                            <div class="network-signal"><i class="fas fa-wifi"></i></div>
+                                        </div>
+                                        <button class="network-connect-btn">Connect</button>
+                                    </div>
+                                    <div class="network-item">
+                                        <div class="network-info">
+                                            <div class="network-name">Wi-Fi Network 2</div>
+                                            <div class="network-signal"><i class="fas fa-wifi"></i></div>
+                                        </div>
+                                        <button class="network-connect-btn">Connect</button>
+                                    </div>
+                                    <div class="network-item">
+                                        <div class="network-info">
+                                            <div class="network-name">Wi-Fi Network 3</div>
+                                            <div class="network-signal"><i class="fas fa-wifi"></i></div>
+                                        </div>
+                                        <button class="network-connect-btn">Connect</button>
+                                    </div>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-network">Back</button>
+                                    <button class="windows-button" id="skip-network">Skip for now</button>
+                                </div>
+                            </div>
+                            
+                            <div class="config-step hidden" id="user-step">
+                                <h3>Create an account</h3>
+                                <div class="form-group">
+                                    <label for="username">Who's going to use this PC?</label>
+                                    <input type="text" id="username" placeholder="Enter a name">
+                                    <small class="error-message"></small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Create a password</label>
+                                    <input type="password" id="password" placeholder="Enter a password">
+                                    <small class="error-message"></small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password-confirm">Confirm password</label>
+                                    <input type="password" id="password-confirm" placeholder="Re-enter password">
+                                    <small class="error-message"></small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password-hint">Password hint</label>
+                                    <input type="text" id="password-hint" placeholder="Enter a hint">
+                                    <small class="error-message"></small>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-user">Back</button>
+                                    <button class="windows-button" id="next-user">Next</button>
+                                </div>
+                            </div>
+                            
+                            <div class="config-step hidden" id="privacy-step">
+                                <h3>Choose privacy settings for your device</h3>
+                                <div class="privacy-options">
+                                    <div class="privacy-option">
+                                        <div class="privacy-label">
+                                            <h4>Location</h4>
+                                            <p>Let apps use your location</p>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="privacy-option">
+                                        <div class="privacy-label">
+                                            <h4>Find my device</h4>
+                                            <p>Let Windows and apps request your location</p>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="privacy-option">
+                                        <div class="privacy-label">
+                                            <h4>Diagnostic data</h4>
+                                            <p>Send diagnostic data to Microsoft</p>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="privacy-option">
+                                        <div class="privacy-label">
+                                            <h4>Tailored experiences</h4>
+                                            <p>Let Microsoft use your diagnostic data</p>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="button-container">
+                                    <button class="windows-button secondary" id="back-privacy">Back</button>
+                                    <button class="windows-button" id="accept-privacy">Accept</button>
+                                </div>
+                            </div>
+                            
+                            <div class="config-step hidden" id="finalizing-step">
+                                <h3>Just a moment...</h3>
+                                <div class="setup-finalizing">
+                                    <div class="spinner"></div>
+                                    <div class="finalizing-text">Setting things up for you</div>
+                                    <div class="finalizing-description">This won't take long.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Complete -->
+                    <div class="windows-screen hidden" id="step-4">
+                        <div class="desktop-screen">
+                            <div class="desktop-background">
+                                <div class="desktop-icons">
+                                    <div class="desktop-icon">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Recycle Bin</span>
+                                    </div>
+                                    <div class="desktop-icon">
+                                        <i class="fas fa-folder"></i>
+                                        <span>Documents</span>
+                                    </div>
+                                    <div class="desktop-icon">
+                                        <i class="fas fa-globe"></i>
+                                        <span>Microsoft Edge</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="taskbar">
+                                    <div class="start-button">
+                                        <i class="fab fa-windows"></i>
+                                    </div>
+                                    <div class="taskbar-icons">
+                                        <div class="taskbar-icon"><i class="fas fa-search"></i></div>
+                                        <div class="taskbar-icon"><i class="fas fa-globe"></i></div>
+                                        <div class="taskbar-icon"><i class="fas fa-folder"></i></div>
+                                        <div class="taskbar-icon"><i class="fas fa-store"></i></div>
+                                    </div>
+                                    <div class="taskbar-tray">
+                                        <div class="taskbar-time" id="taskbar-time"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="congratulations-message">
+                                    <h2>Congratulations!</h2>
+                                    <p>You have successfully completed the Windows installation simulation.</p>
+                                    <button class="windows-button" id="restart-simulation">Restart Simulation</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SimuLearn</h3>
+                    <p>Learn various digital services through interactive simulations</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#simulations">Simulations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@simullearn.com</p>
+                    <p>Phone: +1 234 567 8900</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 SimuLearn. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/windows-simulation.js"></script>
+</body>
+</html> 
